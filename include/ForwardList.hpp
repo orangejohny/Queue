@@ -22,8 +22,10 @@ public:
     auto print(std::ostream&) -> std::ostream&;
     auto search(T) const -> int;
     auto change(T, int) -> int;
-    auto sort() const -> int;
-    auto get() const -> Node<T>*; 
+    auto sort() const -> int; 
+    auto size() const -> std::size_t;
+
+    auto operator[](std::size_t index) const -> T&;
 };
 
 
@@ -177,6 +179,27 @@ auto ForwardList<T>::sort() const -> int {
 }
 
 template <typename T>
-auto ForwardList<T>::get() const -> Node<T>* {
-    return start;
-} 
+auto ForwardList<T>::operator[](std::size_t index) const -> T& {
+    Node<T>* curr = start;
+
+    for (std::size_t i = 0; i < index; i++) {
+        if (curr == nullptr) {
+            throw std::out_of_range("Index is out of range");
+        }
+        curr = curr->next;
+    }
+
+    return curr->data;
+}
+
+template <typename T>
+auto ForwardList<T>::size() const -> std::size_t {
+    Node<T>* curr = start;
+    std::size_t size = 0;
+    while (curr != nullptr) {
+        size++;
+        curr = curr->next;
+    }
+
+    return size;
+}

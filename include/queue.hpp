@@ -30,6 +30,7 @@ public:
     ~Queue();
 private:
     ForwardList<type>* list;
+    auto operator[](std::size_t) const -> type&;
 };
 
 
@@ -46,14 +47,8 @@ template <typename T>
 Queue<T>::Queue(const Queue& q) {
     list = new ForwardList<T>;
 
-    Node<T>* curr = q.list->get();
-    if (!curr) {
-        return;
-    }
-
-    while(curr != nullptr) {
-        push(curr->data);
-        curr = curr->next;
+    for (std::size_t i = 0; i < q.size(); i++) {
+        push(q[i]);
     }
 }
 
@@ -64,14 +59,7 @@ auto Queue<T>::push(T val) -> void {
 
 template <typename T>
 auto Queue<T>::size() const -> std::size_t {
-    Node<T>* curr = list->get();
-    std::size_t size = 0;
-    while (curr != nullptr) {
-        size++;
-        curr = curr->next;
-    }
-
-    return size;
+    return list->size();
 }
 
 template <typename T>
@@ -91,7 +79,7 @@ auto Queue<T>::front() const -> T& {
         throw std::length_error("Empty queue");
     }
 
-    return list->get()->data;
+    return (*this)[0];
 }
 
 template <typename T>
@@ -100,13 +88,7 @@ auto Queue<T>::back() const -> T& {
         throw std::length_error("Empty queue");    
     }
 
-    Node<T>* curr = list->get();
-    
-    while (curr->next != nullptr) {
-        curr = curr->next;
-    }
-
-    return curr->data;
+    return (*this)[size()-1];
 }
 
 template <typename T>
@@ -133,13 +115,8 @@ bool Queue<T>::operator==(const Queue& q) const {
     if (size1 == 0 && size2 == 0) return true;
     if (size1 != size2) return false;
 
-    Node<T>* curr1 = list->get();
-    Node<T>* curr2 = q.list->get();
-
-    while (curr1 != nullptr && curr2 != nullptr) {
-        if (curr1->data != curr2->data) return false;
-        curr1 = curr1->next;
-        curr2 = curr2->next;
+    for (std::size_t i = 0; i < size1; i++) {
+        if ((*this)[i] != q[i]) return false;
     }
 
     return true;
@@ -156,4 +133,9 @@ auto operator>>(std::istream& in, Queue<T>& q) -> std::istream& {
     in >> tmp;
     q.push(tmp);
     return in;
+}
+
+template <typename T>
+auto Queue<T>::operator[](std::size_t index) const -> T& {
+    return (*list)[index];
 }
